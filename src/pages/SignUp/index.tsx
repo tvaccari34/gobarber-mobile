@@ -75,7 +75,7 @@ interface SignUpFormData {
             //     description: 'An error has been occured. Please check your details and try again.'
             // });
         }
-    }, []);
+    }, [navigation]);
 
     return (
         <>
