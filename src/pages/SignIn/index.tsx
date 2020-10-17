@@ -1,9 +1,11 @@
 import React, {useCallback, useRef} from 'react';
-import {Image, View, ScrollView, KeyboardAvoidingView, Platform, TextInput} from 'react-native';
+import {Image, View, ScrollView, KeyboardAvoidingView, Platform, TextInput, Alert} from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import {useNavigation} from '@react-navigation/native';
 import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
+import * as Yup from 'yup';
+import getValidationErrors from '../../utils/getValidationErrors';
 
 
 import Input from '../../components/Input';
@@ -18,6 +20,11 @@ import {Container,
         CreateAccountButton,
         CreateAccountButtonText} from './styles';
 
+interface SignInFormData {
+    email: string;
+    password: string;
+}
+
 const SignIn: React.FC = () => {
     const formRef = useRef<FormHandles>(null);
     const passwordInputRef = useRef<TextInput>(null);
@@ -25,8 +32,43 @@ const SignIn: React.FC = () => {
 
     
 
-    const handleSignIn = useCallback((data: object) => {
-        console.log(data);
+    const handleSignIn = useCallback( async (data: SignInFormData) => {
+
+        try {
+
+            formRef.current?.setErrors({});
+
+            const schema = Yup.object().shape({
+                email: Yup.string().required('E-mail required.').email('Invalid format.'),
+                password: Yup.string().required('Password required.').min(6, 'Password required.'),
+            });
+
+            await schema.validate(data, {
+                abortEarly: false,
+            });
+
+            // await signIn({
+            //     email: data.email,
+            //     password: data.password,
+            // });
+
+            // history.push('/dashboard');
+        } catch (error) {
+            if (error instanceof Yup.ValidationError) {
+                const errors = getValidationErrors(error);
+
+                formRef.current?.setErrors(errors);
+
+                console.log(error);
+
+                return;
+            }
+
+            Alert.alert(
+                'Authentication Error', 
+                'An error has been occured. Please check your credentials.'
+            );
+        }
     }, []);
 
     return (
@@ -59,7 +101,7 @@ const SignIn: React.FC = () => {
                                 }}/>
                             <Input 
                                 ref={passwordInputRef}
-                                name="password" 
+                                name="password"
                                 icon="lock" 
                                 placeholder="Password" 
                                 secureTextEntry

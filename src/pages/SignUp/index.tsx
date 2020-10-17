@@ -1,9 +1,13 @@
-import React, {useRef} from 'react';
-import {Image, View, ScrollView, KeyboardAvoidingView, Platform, TextInput} from 'react-native';
+import React, {useRef, useCallback} from 'react';
+import {Image, View, ScrollView, KeyboardAvoidingView, Platform, TextInput, Alert} from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import {useNavigation} from '@react-navigation/native';
 import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
+import * as Yup from 'yup';
+import getValidationErrors from '../../utils/getValidationErrors';
+
+import api from '../../services/api';
 
 import Input from '../../components/Input';
 import Button from '../../components/Button';
@@ -21,6 +25,58 @@ const SignUp: React.FC = () => {
     const passwordInputRef = useRef<TextInput>(null);
     const navigation = useNavigation();
 
+interface SignUpFormData {
+    name: string;
+    email: string;
+    password: string;
+}
+    
+
+    const handleSignUp = useCallback( async (data: SignUpFormData) => {
+
+        try {
+
+            formRef.current?.setErrors({});
+
+            const schema = Yup.object().shape({
+                name: Yup.string().required('Name required.'),
+                email: Yup.string().required('E-mail required.').email('Invalid format.'),
+                password: Yup.string().required('Password required.').min(6, 'Minimum 6 characteres.'),
+            });
+
+            await schema.validate(data, {
+                abortEarly: false,
+            });
+
+            console.log(data);
+
+            await api.post('/users', data);
+
+            Alert.alert('Registration Success', 'You alread can do the log in.');
+
+            navigation.goBack();
+            
+        } catch (error) {
+            if (error instanceof Yup.ValidationError) {
+                const errors = getValidationErrors(error);
+
+                formRef.current?.setErrors(errors);
+
+                return;
+            }
+
+            console.log(error);
+
+            Alert.alert('Registration Error', 'An error has been occured. Please check your details and try again.');
+
+            // addToast({
+            //     type: 'error',
+            //     title: 'Registration Error',
+            //     description: 'An error has been occured. Please check your details and try again.'
+            // });
+        }
+    }, []);
+
     return (
         <>
             <KeyboardAvoidingView 
@@ -36,7 +92,7 @@ const SignUp: React.FC = () => {
                         <View>
                             <Title>Create Account</Title>
                         </View>
-                        <Form ref={formRef} onSubmit={(data) => {console.log(data)}}>
+                        <Form ref={formRef} onSubmit={handleSignUp}>
                             <Input 
                                 autoCapitalize="words"
                                 name="name" 
