@@ -8,13 +8,20 @@ interface SignInCredentials {
     password: string;
 }
 
+interface User {
+    id: string;
+    name: string;
+    email: string;
+    avatar_url: string;
+}
+
 interface AuthState {
     token: string;
     user: object;
 }
 
 interface AuthContextData {
-    user: object;
+    user: User;
     loading: boolean;
     signIn(credentials: SignInCredentials): Promise<void>;
     signOut(): void;
