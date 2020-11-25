@@ -40,6 +40,7 @@ const AuthProvider: React.FC = ({children}) => {
             const [[,token], [,user]] = await AsyncStorage.multiGet(['@GoBarber:token', '@GoBarber:user']);
 
             if (token && user) {
+                api.defaults.headers.authorization = `Bearer ${token}`;
                 setData({token, user: JSON.parse(user)});
             }
 
@@ -58,6 +59,8 @@ const AuthProvider: React.FC = ({children}) => {
 
         const { token, user } = response.data;
         await AsyncStorage.multiSet([['@GoBarber:user', JSON.stringify(user)], ['@GoBarber:token', token]]);
+
+        api.defaults.headers.authorization = `Bearer ${token}`;
 
         setData({ token, user });
 
