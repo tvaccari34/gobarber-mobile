@@ -60,10 +60,10 @@ buck-out/
 *.jsbundle
 
 # CocoaPods
-#/ios/Pods/
+/ios/Pods/
 
 # Android
-#android/
+android/
 
 # ios
-#ios/
+ios/

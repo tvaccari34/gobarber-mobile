@@ -54,18 +54,18 @@ interface ProfileFormData {
                 email: Yup.string().required('E-mail required.').email('Invalid format.'),
                 old_password: Yup.string(),
                 password: Yup.string().when('old_password', {
-                    is: val => !!val.length,
+                    is: val => !!val && !!val.length,
                     then: Yup.string().required('Password required'),
                     otherwise: Yup.string(),
                 }),
                 password_confirmation: Yup.string().when('old_password', {
-                    is: val => !!val.length,
+                    is: val => !!val && !!val.length,
                     then: Yup.string().required('Password confirmation required'),
                     otherwise: Yup.string(),
                 })
                 .oneOf([Yup.ref('password'), undefined], 'Password must match'),
             });
-
+            
             const { name, email, old_password, password, password_confirmation } = data;
 
             //const formData = Object.assign({ name, email }, old_password && { old_password, password, password_confirmation});
