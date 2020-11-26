@@ -48,8 +48,6 @@ interface SignUpFormData {
                 abortEarly: false,
             });
 
-            console.log(data);
-
             await api.post('/users', data);
 
             Alert.alert('Registration Success', 'You alread can do the log in.');
@@ -65,15 +63,7 @@ interface SignUpFormData {
                 return;
             }
 
-            console.log(error);
-
             Alert.alert('Registration Error', 'An error has been occured. Please check your details and try again.');
-
-            // addToast({
-            //     type: 'error',
-            //     title: 'Registration Error',
-            //     description: 'An error has been occured. Please check your details and try again.'
-            // });
         }
     }, [navigation]);
 
