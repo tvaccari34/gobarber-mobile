@@ -65,7 +65,7 @@ interface ProfileFormData {
                 })
                 .oneOf([Yup.ref('password'), undefined], 'Password must match'),
             });
-            
+
             const { name, email, old_password, password, password_confirmation } = data;
 
             //const formData = Object.assign({ name, email }, old_password && { old_password, password, password_confirmation});
@@ -79,16 +79,10 @@ interface ProfileFormData {
                     password_confirmation,
                 } : {}),
             }
-            
-            console.log('1');
-            console.log(formData);
 
             await schema.validate(formData, {
                 abortEarly: false,
             });
-
-            console.log('2');
-            console.log(formData);
 
             const response = await api.put('/profile', formData);
 
@@ -106,8 +100,6 @@ interface ProfileFormData {
 
                 return;
             }
-
-            console.log(error);
 
             Alert.alert('Profile Update Error', 'An error has been occured. Please check your details and try again.');
         }
