@@ -68,6 +68,8 @@ interface ProfileFormData {
 
             const { name, email, old_password, password, password_confirmation } = data;
 
+            //const formData = Object.assign({ name, email }, old_password && { old_password, password, password_confirmation});
+
             const formData = {
                 name,
                 email,
@@ -77,16 +79,18 @@ interface ProfileFormData {
                     password_confirmation,
                 } : {}),
             }
-
+            
+            console.log('1');
             console.log(formData);
 
-            await schema.validate(data, {
+            await schema.validate(formData, {
                 abortEarly: false,
             });
 
-            const response = await api.put('/profile', formData);
+            console.log('2');
+            console.log(formData);
 
-            
+            const response = await api.put('/profile', formData);
 
             updateUser(response.data);
 
