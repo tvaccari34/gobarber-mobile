@@ -30,15 +30,20 @@ const Dashboard: React.FC = () => {
 
     const [providers, setProviders] = useState<Provider[]>([])
 
-    const {user} = useAuth();
+    const {user, signOut} = useAuth();
 
     const {navigate} = useNavigation();
 
     useEffect(() => {
         api.get('/providers')
             .then(response => {
+                console.log(response.data);
                 setProviders(response.data);
             })
+            .catch(() => {
+                signOut();
+                navigate('SignIn');
+            });
     }, [])
 
     const navigateToProfile = useCallback(() => {

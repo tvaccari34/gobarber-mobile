@@ -1,5 +1,6 @@
 import React, {useRef, useCallback} from 'react';
-import {Image, View, ScrollView, KeyboardAvoidingView, Platform, TextInput, Alert} from 'react-native';
+import {View, ScrollView, KeyboardAvoidingView, Platform, TextInput, Alert} from 'react-native';
+import ImagePicker from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/Feather';
 import {useNavigation} from '@react-navigation/native';
 import { Form } from '@unform/mobile';
@@ -42,6 +43,44 @@ interface ProfileFormData {
     password_confirmation: string;
 }
     
+    const handleUserAvatar = useCallback(() => {
+        ImagePicker.showImagePicker({
+            title: 'Select an Avatar',
+            cancelButtonTitle: 'Cancel',
+            takePhotoButtonTitle: 'Take a photo',
+            chooseFromLibraryButtonTitle: 'Choose from gallery',
+        }, response => {
+            if (response.didCancel) {
+                console.log('User cancelled image picker');
+                return;
+            } 
+              
+            if (response.error) {
+                console.log('ImagePicker Error: ', response.error);
+                Alert.alert('An error has been occured when trying to update your avatar');
+            } 
+           
+            const data = new FormData();
+
+            data.append('avatar', {
+                type: 'image/jpeg',
+                name: `${user.id}.jpg`,
+                uri: response.uri,
+            })
+
+            // You can also display the image using data:
+            // const source = { uri: 'data:image/jpeg;base64,' + response.data };
+            // this.setState({
+            //     avatarSource: source,
+            // });
+
+            api.patch('users/avatar', data)
+            .then(apiResponse => {
+                updateUser(apiResponse.data);
+            });
+
+        });
+    }, [updateUser, user.id]);
 
     const handleProfile = useCallback( async (data: ProfileFormData) => {
 
@@ -67,8 +106,6 @@ interface ProfileFormData {
             });
 
             const { name, email, old_password, password, password_confirmation } = data;
-
-            //const formData = Object.assign({ name, email }, old_password && { old_password, password, password_confirmation});
 
             const formData = {
                 name,
@@ -107,7 +144,7 @@ interface ProfileFormData {
 
     const handleGoBack = useCallback(() => {
         navigation.goBack();
-    }, [navigation]);
+    }, [navigation, updateUser]);
 
     return (
         <>
@@ -125,7 +162,8 @@ interface ProfileFormData {
                             <Icon name="chevron-left" size={24} color="#999591" />
                         </BackButton>
 
-                        <UserAvatarButton>
+
+                        <UserAvatarButton onPress={handleUserAvatar}>
                             <UserAvatar source={{ uri: user.avatar_url }}></UserAvatar>
                         </UserAvatarButton>
                         
